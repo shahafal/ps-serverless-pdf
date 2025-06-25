@@ -1,0 +1,12 @@
+{
+  "name": "@node-serverless-app/processing-service",
+  "version": "1.0.0",
+  "main": "index.js",
+  "dependencies": {
+    "@aws-sdk/client-s3": "3.835.0",
+    "@aws-sdk/client-textract": "3.835.0",
+    "@aws-sdk/lib-dynamodb": "3.835.0",
+    "lambda-micro": "1.0.2",
+    "pdf-lib": "1.17.1"
+  }
+}

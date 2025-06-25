@@ -1,0 +1,14 @@
+{
+  "name": "@node-serverless-app/services-common",
+  "version": "1.0.0",
+  "main": "index.js",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "3.835.0",
+    "@aws-sdk/lib-dynamodb": "3.835.0",
+    "@aws-sdk/client-s3": "3.835.0",
+    "@aws-sdk/client-textract": "3.835.0",
+    "@aws-sdk/client-ses": "3.835.0",
+    "@aws-sdk/client-eventbridge": "3.835.0",
+    "ksuid": "3.0.0"
+  }
+}
