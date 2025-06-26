@@ -1,9 +1,12 @@
 import { DeleteCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
+import { PutEventsCommand } from "@aws-sdk/client-eventbridge";
 import { createRouter, RouterType, Matcher, validatePathVariables, validateBodyJSONVariables } from 'lambda-micro';
 import { AWSClients, generateID } from '../common';
 
 const dynamoDB = AWSClients.dynamoDB();
 const tableName = process.env.DYNAMO_DB_TABLE;
+
+const eventbridge = AWSClients.eventbridge();
 
 const schemas = {
     createComment: require('./schemas/createComment.json'),
@@ -40,6 +43,24 @@ const createComment = async (request, response) => {
         ReturnValues: 'NONE'
     };
     await dynamoDB.put(params);
+
+    const detail = {
+        documentId: request.pathVariables.docid,
+        commentId,
+    };
+    const eventParams = {
+        Entries: [
+            {
+                Detail: JSON.stringify(detail),
+                DetailType: 'CommentAdded',
+                EventBusName: 'com.globomantics.dms',
+                Resources: [],
+                Source: 'com.globomantics.dms.comments',
+            }
+        ]
+    };
+    await eventbridge.send(new PutEventsCommand(eventParams));
+
     return response.output(item, 200);
 };
 

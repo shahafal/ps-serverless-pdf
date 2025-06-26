@@ -4,6 +4,7 @@
   "main": "index.js",
   "dependencies": {
     "lambda-micro": "1.0.2",
-    "@aws-sdk/lib-dynamodb": "3.835.0"
+    "@aws-sdk/lib-dynamodb": "3.835.0",
+    "@aws-sdk/client-eventbridge": "3.835.0"
   }
 }
