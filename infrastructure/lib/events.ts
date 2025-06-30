@@ -5,9 +5,6 @@ import * as sfn from 'aws-cdk-lib/aws-stepfunctions';
 import * as events from 'aws-cdk-lib/aws-events';
 import * as targets from 'aws-cdk-lib/aws-events-targets';
 import { Construct } from 'constructs';
-import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs'
-import { NodejsServiceFunction } from './constructs/lambda'
-import { Duration } from 'aws-cdk-lib';
 
 interface ApplicationEventsProps {
     processingStateMachine: sfn.IStateMachine;
