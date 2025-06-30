@@ -105,7 +105,7 @@ const createDocument = async (request, response) => {
 
     await uploadFileToS3(fileId, file);
 
-    const userId = '2253c331-e083-47a5-ac92-67ed749d16ba';
+    const userId = request.event.requestContext.authorizer.jwt.claims.username;
     const item = {
         PK: fileId,
         SK: 'Doc#Marketing',

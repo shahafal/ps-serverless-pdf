@@ -28,7 +28,7 @@ const getAllCommentsForDocument = async (request, response) => {
 };
 
 const createComment = async (request, response) => {
-    const userId = '2253c331-e083-47a5-ac92-67ed749d16ba';
+    const userId = request.event.requestContext.authorizer.jwt.claims.username;
     const commentId = `Comment#${generateID()}`;
     const item = {
         PK: request.pathVariables.docid,
