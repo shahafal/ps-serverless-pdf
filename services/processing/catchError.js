@@ -10,10 +10,7 @@ const dynamoDB = AWSClients.dynamoDB();
 const tableName = process.env.DYNAMO_DB_TABLE;
 
 exports.handler = async event => {
-    const filename =
-        Object.prototyle.hasOwnProperty.call(event, 'detail') && event.detail.requestParameters.key
-            ? event.detail.requestParameters.key
-            : event.file.key;
+    const filename = event?.detail?.requestParameters?.key ?? event.file.key;
 
     if (!filename || filename.length < 5) {
         throw new Error('Could not determine filename from input data');
@@ -21,7 +18,7 @@ exports.handler = async event => {
 
     const key = path.basename(filename, '.pdf');
 
-    const getOwnerParDeleteCommandams = {
+    const getOwnerParams = {
         TableName: tableName,
         KeyConditionExpression: 'PK = :key AND begins_with(SK, :prefix)',
         ExpressionAttributeValues: {
