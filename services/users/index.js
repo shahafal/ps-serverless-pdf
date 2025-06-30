@@ -69,7 +69,7 @@ const getUsersInGroup = async (groupName, nextToken) => {
     if (nextToken) {
         params.NextToken = nextToken;
     }
-    const result = await cisp.send(new ListUsersInGroupCommand(params)).promise();
+    const result = await cisp.send(new ListUsersInGroupCommand(params));
     let users = result.Users;
     if (result.NextToken) {
         users = [...users, await getUsersInGroup(groupName, result.NextToken)];
