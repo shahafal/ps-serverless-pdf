@@ -1,6 +1,6 @@
 import * as path from 'path';
 import { URL } from 'url';
-import { validatePathVariables, validateMultipartFormData, parseMultipartFormData, createRouter, RouterType, Matcher } from 'lambda-micro';
+import { validatePathVariables, validateMultipartFormData, parseMultipartFormData, createRouter, RouterType, Matcher, enforceGroupMembership } from 'lambda-micro';
 import { AWSClients, generateID } from '../common';
 import { PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
@@ -136,8 +136,8 @@ const router = createRouter(RouterType.HTTP_API_V2);
 
 router.add(Matcher.HttpApiV2('GET', '/documents/'), getAllDocuments);
 router.add(Matcher.HttpApiV2('GET', '/documents(/:id)'), validatePathVariables(schemas.idPathVariable), getDocument);
-router.add(Matcher.HttpApiV2('DELETE', '/documents(/:id)'), validatePathVariables(schemas.idPathVariable), deleteDocument);
-router.add(Matcher.HttpApiV2('POST', '/documents/'), parseMultipartFormData, validateMultipartFormData(schemas.createDocument), createDocument);
+router.add(Matcher.HttpApiV2('DELETE', '/documents(/:id)'), enforceGroupMembership(['admin', 'contributor']),validatePathVariables(schemas.idPathVariable), deleteDocument);
+router.add(Matcher.HttpApiV2('POST', '/documents/'), enforceGroupMembership(['admin', 'contributor']), parseMultipartFormData, validateMultipartFormData(schemas.createDocument), createDocument);
 
 exports.handler = async (event, context) => {
     return router.run(event, context);
