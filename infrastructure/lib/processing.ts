@@ -126,6 +126,34 @@ export class DocumentProcessing extends Construct {
             outputPath: '$.Payload'
         });
 
+        const catchError = new NodejsServiceFunction(this, 'CatchErrorLambda', {
+            entry: path.join(__dirname, '../../services/processing/catchError.js'),
+        });
+
+        catchError.addEnvironment('DYNAMO_DB_TABLE', props.documentsTable.tableName);
+        catchError.addEnvironment('UPLOAD_BUCKET', props.uploadBucket.bucketName);
+        catchError.addEnvironment('ASSET_BUCKET', props.assetBucket.bucketName);
+        props.uploadBucket.grantReadWrite(catchError);
+        props.assetBucket.grantReadWrite(catchError);
+
+        catchError.addToRolePolicy(
+            new iam.PolicyStatement({
+                resources: [props.documentsTable.tableArn],
+                actions: ['dynamodb:DeleteItem', 'dynamodb:Query'],
+            })
+        );
+
+        catchError.addToRolePolicy(
+            new iam.PolicyStatement({
+                resources: ['*'],
+                actions: ['events:PutEvents'],
+            })
+        );
+
+        const catchErrorInvoke = new tasks.LambdaInvoke(this, 'Unable to process - Rollback all data', {
+            lambdaFunction: catchError
+        });
+
         const waitStep = new sfn.Wait(this, 'WaitStep', {
             time: sfn.WaitTime.duration(Duration.seconds(60)),
             comment: 'Wait before checking for text detection'
@@ -153,6 +181,13 @@ export class DocumentProcessing extends Construct {
             .next(parallelProcessing)
             .next(insertDocumentInvoke);
 
+        const catchProps: sfn.CatchProps = {
+            resultPath: '$.error'
+        };
+
+        getDocumentMetadataInvoke.addCatch(catchErrorInvoke, catchProps);
+        parallelProcessing.addCatch(catchErrorInvoke, catchProps);
+        insertDocumentInvoke.addCatch(catchErrorInvoke, catchProps);
 
         this.processingStateMachine = new sfn.StateMachine(this, 'ProcessingStateMachine', {
             definitionBody: sfn.DefinitionBody.fromChainable(stepFunctionDefinition),
