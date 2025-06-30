@@ -1,5 +1,6 @@
 import * as apigw from 'aws-cdk-lib/aws-apigatewayv2';
 import * as apigi from 'aws-cdk-lib/aws-apigatewayv2-integrations';
+import * as cognito from 'aws-cdk-lib/aws-cognito';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as sqs from 'aws-cdk-lib/aws-sqs';
@@ -7,10 +8,13 @@ import { HttpMethod } from 'aws-cdk-lib/aws-events';
 import { Construct } from 'constructs';
 import { CorsHttpMethod } from 'aws-cdk-lib/aws-apigatewayv2';
 import { CfnOutput, Duration } from 'aws-cdk-lib';
+import { HttpUserPoolAuthorizer } from 'aws-cdk-lib/aws-apigatewayv2-authorizers';
 
 interface ApplicationAPIProps {
     commentsService: lambda.IFunction;
     documentsService: lambda.IFunction;
+    userPool: cognito.IUserPool;
+    userPoolClient: cognito.IUserPoolClient;
 };
 
 export class ApplicationAPI extends Construct {
@@ -45,12 +49,17 @@ export class ApplicationAPI extends Construct {
             }
         });
 
+        const authorizer = new HttpUserPoolAuthorizer('Authorizer', props.userPool, {
+            userPoolClients: [props.userPoolClient],
+        });
+
         const commentsServiceIntegration = new apigi.HttpLambdaIntegration('CommentsIntegration', props.commentsService);
 
         this.httpApi.addRoutes({
             path: `/comments/{proxy+}`,
             methods: serviceMethods,
-            integration: commentsServiceIntegration
+            integration: commentsServiceIntegration,
+            authorizer
         });
 
         const documentsServiceIntegration = new apigi.HttpLambdaIntegration('DocumentsServiceIntegration', props.documentsService);
@@ -59,6 +68,7 @@ export class ApplicationAPI extends Construct {
             path: `/documents/{proxy+}`,
             methods: serviceMethods,
             integration: documentsServiceIntegration,
+            authorizer
         });
 
         const queue = new sqs.Queue(this, 'ModerationQueue');

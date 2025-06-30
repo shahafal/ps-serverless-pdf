@@ -14,7 +14,7 @@ export class InfrastructureStack extends cdk.Stack {
 
     const storage = new AssetStorage(this, 'Storage');
 
-    new ApplicationAuth(this, 'Auth');
+    const auth = new ApplicationAuth(this, 'Auth');
 
     const database = new AppDatabase(this, 'Database');
 
@@ -26,7 +26,9 @@ export class InfrastructureStack extends cdk.Stack {
 
     new ApplicationAPI(this, 'API', {
       commentsService: services.commentsService,
-      documentsService: services.documentsService
+      documentsService: services.documentsService,
+      userPool: auth.userPool,
+      userPoolClient: auth.userPoolClient
     });
 
     const processing = new DocumentProcessing(this, 'Processing', {
