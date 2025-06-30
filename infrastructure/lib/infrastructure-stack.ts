@@ -6,12 +6,15 @@ import { AppServices } from './services';
 import { ApplicationAPI } from './api';
 import { ApplicationEvents } from './events';
 import { DocumentProcessing } from './processing';
+import { ApplicationAuth } from './auth';
 
 export class InfrastructureStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
     const storage = new AssetStorage(this, 'Storage');
+
+    new ApplicationAuth(this, 'Auth');
 
     const database = new AppDatabase(this, 'Database');
 
