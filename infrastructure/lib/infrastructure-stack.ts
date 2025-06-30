@@ -21,12 +21,14 @@ export class InfrastructureStack extends cdk.Stack {
     const services = new AppServices(this, 'Services', {
       documentsTable: database.documentsTable,
       uploadBucket: storage.uploadBucket,
-      assetBucket: storage.assetBucket
+      assetBucket: storage.assetBucket,
+      userPool: auth.userPool
     });
 
     new ApplicationAPI(this, 'API', {
       commentsService: services.commentsService,
       documentsService: services.documentsService,
+      usersService: services.usersService,
       userPool: auth.userPool,
       userPoolClient: auth.userPoolClient
     });

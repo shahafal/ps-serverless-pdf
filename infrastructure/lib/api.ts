@@ -13,6 +13,7 @@ import { HttpUserPoolAuthorizer } from 'aws-cdk-lib/aws-apigatewayv2-authorizers
 interface ApplicationAPIProps {
     commentsService: lambda.IFunction;
     documentsService: lambda.IFunction;
+    usersService: lambda.IFunction;
     userPool: cognito.IUserPool;
     userPoolClient: cognito.IUserPoolClient;
 };
@@ -69,6 +70,16 @@ export class ApplicationAPI extends Construct {
             methods: serviceMethods,
             integration: documentsServiceIntegration,
             authorizer
+        });
+
+        const usersServiceIntegration = new apigi.HttpLambdaIntegration('UsersServiceIntegration',
+            props.usersService, {});
+
+        this.httpApi.addRoutes({
+            path: `/users/{proxy+}`,
+            methods: serviceMethods,
+            integration: usersServiceIntegration,
+            authorizer,
         });
 
         const queue = new sqs.Queue(this, 'ModerationQueue');
