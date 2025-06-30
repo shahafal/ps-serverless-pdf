@@ -4,6 +4,7 @@ import { S3Client } from "@aws-sdk/client-s3";
 import { TextractClient } from "@aws-sdk/client-textract";
 import { SESClient } from "@aws-sdk/client-ses";
 import { EventBridgeClient } from "@aws-sdk/client-eventbridge";
+import { CognitoIdentityProviderClient } from "@aws-sdk/client-cognito-identity-provider";
 
 let _dynamoDB;
 
@@ -51,10 +52,20 @@ const eventbridge = () => {
     return _eventbridge;
 }
 
+let _cisp;
+
+const cisp = () => {
+  if (!_cisp) {
+    _cisp = new CognitoIdentityProviderClient({});
+  }
+  return _cisp;
+};
+
 export const AWSClients = {
     dynamoDB,
     s3,
     textract,
     ses,
-    eventbridge
+    eventbridge,
+    cisp
 };

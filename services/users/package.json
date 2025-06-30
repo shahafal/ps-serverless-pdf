@@ -1,0 +1,12 @@
+{
+  "name": "@node-serverless-app/users-service",
+  "version": "1.0.0",
+  "main": "index.js",
+  "dependencies": {
+    "@aws-sdk/client-s3": "3.835.0",
+    "@aws-sdk/s3-request-presigner": "3.835.0",
+    "@aws-sdk/client-cognito-identity-provider": "3.835.0",
+    "lambda-micro": "1.0.2",
+    "pdf-lib": "1.17.1"
+  }
+}

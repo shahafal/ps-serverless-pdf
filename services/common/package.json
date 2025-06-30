@@ -9,6 +9,7 @@
     "@aws-sdk/client-textract": "3.835.0",
     "@aws-sdk/client-ses": "3.835.0",
     "@aws-sdk/client-eventbridge": "3.835.0",
+    "@aws-sdk/client-cognito-identity-provider": "3.835.0",
     "ksuid": "3.0.0"
   }
 }
