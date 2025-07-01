@@ -1,12 +1,13 @@
-import { Construct } from 'constructs';
-import { AssetStorage } from './storage';
 import * as cdk from 'aws-cdk-lib';
 import { AppDatabase } from './database';
-import { AppServices } from './services';
 import { ApplicationAPI } from './api';
-import { ApplicationEvents } from './events';
-import { DocumentProcessing } from './processing';
 import { ApplicationAuth } from './auth';
+import { ApplicationEvents } from './events';
+import { ApplicationMonitoring } from './monitoring';
+import { AppServices } from './services';
+import { AssetStorage } from './storage';
+import { Construct } from 'constructs';
+import { DocumentProcessing } from './processing';
 
 export class InfrastructureStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -25,7 +26,7 @@ export class InfrastructureStack extends cdk.Stack {
       userPool: auth.userPool
     });
 
-    new ApplicationAPI(this, 'API', {
+    const api = new ApplicationAPI(this, 'API', {
       commentsService: services.commentsService,
       documentsService: services.documentsService,
       usersService: services.usersService,
@@ -43,6 +44,16 @@ export class InfrastructureStack extends cdk.Stack {
       uploadBucket: storage.uploadBucket,
       processingStateMachine: processing.processingStateMachine,
       notificationsService: services.notificationsService
+    });
+
+    new ApplicationMonitoring(this, 'Monitoring', {
+      api: api.httpApi,
+      table: database.documentsTable,
+      processingStateMachine: processing.processingStateMachine,
+      assetsBucket: storage.assetBucket,
+      documentsService: services.documentsService,
+      commentsService: services.commentsService,
+      usersService: services.usersService
     });
   }
 }
