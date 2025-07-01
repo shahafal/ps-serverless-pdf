@@ -1,6 +1,6 @@
 import * as path from 'path';
 import { URL } from 'url';
-import { validatePathVariables, validateMultipartFormData, parseMultipartFormData, createRouter, RouterType, Matcher, enforceGroupMembership } from 'lambda-micro';
+import { validatePathVariables, validateMultipartFormData, parseMultipartFormData, createRouter, RouterType, Matcher, enforceGroupMembership, getLogger } from 'lambda-micro';
 import { AWSClients, generateID } from '../common';
 import { PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
@@ -52,6 +52,10 @@ const createSignedS3URL = async unsignedURL => {
 };
 
 const getAllDocuments = async (request, response) => {
+    const logger = getLogger(request.event, request.context);
+    
+    logger.info("Getting all documents from dynamoDB");
+
     const params = {
         TableName: tableName,
         IndexName: 'GSI1',
@@ -61,10 +65,17 @@ const getAllDocuments = async (request, response) => {
         },
     };
     const results = await dynamoDB.send(new QueryCommand(params));
+
+    logger.info("Successfully got all documents from dynamoDB");
+
     return response.output(results.Items, 200);
 };
 
 const getDocument = async (request, response) => {
+    const logger = getLogger(request.event, request.context);
+    
+    logger.info(`Getting document id ${request.pathVariables.id} from dynamoDB`);
+
     const params = {
         TableName: tableName,
         KeyConditionExpression: 'PK = :key AND begins_with(SK, :prefix)',
@@ -74,13 +85,22 @@ const getDocument = async (request, response) => {
         },
     };
     const results = await dynamoDB.send(new QueryCommand(params));
+    
+    logger.info("Successfully got document from dynamoDB");
+
     const document = results.Items[0];
     document.Thumbnail = await createSignedS3URL(document.Thumbnail);
+    logger.info("Successfully signed thumbnail s3 url");
     document.Document = await createSignedS3URL(document.Document);
+    logger.info("Successfully signed document s3 url");
     return response.output(document, 200);
 };
 
 const deleteDocument = async (request, response) => {
+    const logger = getLogger(request.event, request.context);
+
+    logger.info(`Deleting document id ${request.pathVariables.id} from dynamoDB`);
+
     const params = {
         TableName: tableName,
         KeyConditionExpression: 'PK = :key',
@@ -95,16 +115,25 @@ const deleteDocument = async (request, response) => {
         },
     };
     await dynamoDB.send(new BatchWriteCommand(batchParams));
+
+    logger.info("Successfully deleted document from dynamoDB");
+
     return response.output({}, 200);
 };
 
 const createDocument = async (request, response) => {
+    const logger = getLogger(request.event, request.context);
+
+    logger.info("Creating a new document");
+
     const file = request.formData.files[0];
     const { fields } = request.formData;
     const fileId = generateID();
 
+    logger.info("Uploading document to s3");
     await uploadFileToS3(fileId, file);
 
+    logger.info("Adding a new document record to dynamoDB");
     const userId = request.event.requestContext.authorizer.jwt.claims.username;
     const item = {
         PK: fileId,
@@ -129,6 +158,9 @@ const createDocument = async (request, response) => {
         ReturnValues: 'NONE',
     };
     await dynamoDB.put(params);
+    
+    logger.info("Successfully created new document record in dynamoDB");
+
     return response.output('Document created', 200);
 };
 
