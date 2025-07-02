@@ -1,6 +1,6 @@
 import { DeleteCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
 import { PutEventsCommand } from "@aws-sdk/client-eventbridge";
-import { createRouter, RouterType, Matcher, validatePathVariables, validateBodyJSONVariables } from 'lambda-micro';
+import { createRouter, RouterType, Matcher, validatePathVariables, validateBodyJSONVariables, getLogger } from 'lambda-micro';
 import { AWSClients, generateID } from '../common';
 
 const dynamoDB = AWSClients.dynamoDB();
@@ -15,6 +15,10 @@ const schemas = {
 };
 
 const getAllCommentsForDocument = async (request, response) => {
+    const logger = getLogger(request.event, request.context);
+
+    logger.info(`Getting all comments for document id ${request.pathVariables.docid}`);
+
     const params = {
         TableName: tableName,
         KeyConditionExpression: 'PK = :pk AND begins_with(SK, :sk)',
@@ -24,10 +28,17 @@ const getAllCommentsForDocument = async (request, response) => {
         }
     };
     const results = await dynamoDB.send(new QueryCommand(params));
+
+    logger.info("Successfully got all comments");
+
     return response.output(results.Items, 200);
 };
 
 const createComment = async (request, response) => {
+    const logger = getLogger(request.event, request.context);
+
+    logger.info(`Creating a new comment for document id ${request.pathVariables.docid}`);
+
     const userId = request.event.requestContext.authorizer.jwt.claims.username;
     const commentId = `Comment#${generateID()}`;
     const item = {
@@ -43,6 +54,8 @@ const createComment = async (request, response) => {
         ReturnValues: 'NONE'
     };
     await dynamoDB.put(params);
+
+    logger.info("Raising a new CommentAdded event");
 
     const detail = {
         documentId: request.pathVariables.docid,
@@ -60,6 +73,8 @@ const createComment = async (request, response) => {
         ]
     };
     await eventbridge.send(new PutEventsCommand(eventParams));
+
+    logger.info("Successfully raised CommentAdded event");
 
     return response.output(item, 200);
 };
