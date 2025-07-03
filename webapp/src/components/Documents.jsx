@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
     Paper, 
     Table, 
@@ -14,6 +15,7 @@ import {
 import { fetchDocuments } from '../api/documents';
 
 function Documents() {
+    const navigate = useNavigate();
     const [documents, setDocuments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -42,6 +44,10 @@ function Documents() {
             hour: '2-digit',
             minute: '2-digit'
         });
+    }
+
+    function handleRowClick(id) {
+        navigate(`/documents/${id}`);
     }
 
     if (loading) {
@@ -76,7 +82,12 @@ function Documents() {
                     </TableHead>
                     <TableBody>
                         {documents.map((doc) => (
-                            <TableRow key={doc.PK}>
+                            <TableRow 
+                                key={doc.PK}
+                                onClick={() => handleRowClick(doc.PK)}
+                                hover
+                                sx={{ cursor: 'pointer' }}
+                            >
                                 <TableCell>{doc.Name}</TableCell>
                                 <TableCell>{doc.Owner}</TableCell>
                                 <TableCell>{formatDate(doc.DateUploaded)}</TableCell>
