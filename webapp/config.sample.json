@@ -1,0 +1,10 @@
+{
+  "api": {
+    "endpoint": "https://your-api-endpoint.com"
+  },
+  "auth": {
+    "userPoolId": "region_XXXXXXXXX",
+    "clientId": "your-client-id",
+    "region": "your-region"
+  }
+}
