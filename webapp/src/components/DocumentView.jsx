@@ -179,6 +179,46 @@ function DocumentView() {
                                         secondary={document.FileDetails?.contentType}
                                     />
                                 </ListItem>
+                                {document.Metadata?.title && (
+                                    <ListItem>
+                                        <ListItemText
+                                            primary="PDF Title"
+                                            secondary={document.Metadata.title}
+                                        />
+                                    </ListItem>
+                                )}
+                                {document.Metadata?.author && (
+                                    <ListItem>
+                                        <ListItemText
+                                            primary="Author"
+                                            secondary={document.Metadata.author}
+                                        />
+                                    </ListItem>
+                                )}
+                                {document.Metadata?.pageCount && (
+                                    <ListItem>
+                                        <ListItemText
+                                            primary="Page Count"
+                                            secondary={document.Metadata.pageCount}
+                                        />
+                                    </ListItem>
+                                )}
+                                {document.Metadata?.createdDate && (
+                                    <ListItem>
+                                        <ListItemText
+                                            primary="Created Date"
+                                            secondary={formatDate(document.Metadata.createdDate)}
+                                        />
+                                    </ListItem>
+                                )}
+                                {document.Metadata?.modifiedDate && (
+                                    <ListItem>
+                                        <ListItemText
+                                            primary="Modified Date"
+                                            secondary={formatDate(document.Metadata.modifiedDate)}
+                                        />
+                                    </ListItem>
+                                )}
                                 {document.Tags && (
                                     <ListItem>
                                         <ListItemText
