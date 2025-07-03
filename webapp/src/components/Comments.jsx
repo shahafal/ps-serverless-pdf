@@ -138,21 +138,22 @@ function Comments({ documentId }) {
                             }
                         >
                             <ListItemText
+                                primary={
+                                    <Typography
+                                        component="span"
+                                        variant="body2"
+                                        color="text.primary"
+                                    >
+                                        {comment.Owner}
+                                    </Typography>
+                                }
                                 secondary={
                                     <>
-                                        <Typography
-                                            component="span"
-                                            variant="body2"
-                                            color="text.primary"
-                                            sx={{ display: 'block' }}
-                                        >
-                                            {comment.Owner}
-                                        </Typography>
                                         {formatDate(comment.DateAdded)}
                                         <Typography
-                                            component="div"
+                                            component="span"
                                             variant="body1"
-                                            sx={{ mt: 1 }}
+                                            sx={{ display: 'block', mt: 1 }}
                                         >
                                             {comment.Comment}
                                         </Typography>
