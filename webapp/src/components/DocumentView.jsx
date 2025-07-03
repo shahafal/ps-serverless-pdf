@@ -14,10 +14,12 @@ import {
     ListItem,
     ListItemText,
     Chip,
-    Box
+    Box,
+    Container
 } from '@mui/material';
 import { ArrowBack, Download } from '@mui/icons-material';
 import { fetchDocument } from '../api/documents';
+import Comments from './Comments';
 
 function formatDate(isoDate) {
     return new Date(isoDate).toLocaleDateString('en-US', {
@@ -69,93 +71,97 @@ function DocumentView() {
     }
 
     return (
-        <div style={{ padding: '1rem' }}>
-            <Button
-                startIcon={<ArrowBack />}
-                onClick={() => navigate('/documents')}
-                sx={{ marginBottom: 2 }}
-            >
-                Back to Documents
-            </Button>
+        <Container maxWidth="lg">
+            <div style={{ padding: '1rem' }}>
+                <Button
+                    startIcon={<ArrowBack />}
+                    onClick={() => navigate('/documents')}
+                    sx={{ marginBottom: 2 }}
+                >
+                    Back to Documents
+                </Button>
 
-            <Grid container spacing={3}>
-                <Grid item xs={12} md={4}>
-                    <Card>
-                        <CardMedia
-                            component="img"
-                            image={document.Thumbnail}
-                            alt={document.Name}
-                            sx={{ objectFit: 'contain', maxHeight: 300 }}
-                        />
-                        <CardContent>
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                startIcon={<Download />}
-                                fullWidth
-                                href={document.Document}
-                                target="_blank"
-                            >
-                                Download PDF
-                            </Button>
-                        </CardContent>
-                    </Card>
-                </Grid>
+                <Grid container spacing={3}>
+                    <Grid item xs={12} md={4}>
+                        <Card>
+                            <CardMedia
+                                component="img"
+                                image={document.Thumbnail}
+                                alt={document.Name}
+                                sx={{ objectFit: 'contain', maxHeight: 300 }}
+                            />
+                            <CardContent>
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    startIcon={<Download />}
+                                    fullWidth
+                                    href={document.Document}
+                                    target="_blank"
+                                >
+                                    Download PDF
+                                </Button>
+                            </CardContent>
+                        </Card>
+                    </Grid>
 
-                <Grid item xs={12} md={8}>
-                    <Paper sx={{ padding: 2 }}>
-                        <Typography variant="h5" gutterBottom>
-                            {document.Name}
-                        </Typography>
+                    <Grid item xs={12} md={8}>
+                        <Paper sx={{ padding: 2 }}>
+                            <Typography variant="h5" gutterBottom>
+                                {document.Name}
+                            </Typography>
 
-                        <List>
-                            <ListItem>
-                                <ListItemText
-                                    primary="Owner"
-                                    secondary={document.Owner}
-                                />
-                            </ListItem>
-                            <ListItem>
-                                <ListItemText
-                                    primary="Upload Date"
-                                    secondary={formatDate(document.DateUploaded)}
-                                />
-                            </ListItem>
-                            <ListItem>
-                                <ListItemText
-                                    primary="File Name"
-                                    secondary={document.FileDetails?.fileName}
-                                />
-                            </ListItem>
-                            <ListItem>
-                                <ListItemText
-                                    primary="Content Type"
-                                    secondary={document.FileDetails?.contentType}
-                                />
-                            </ListItem>
-                            {document.Tags && (
+                            <List>
                                 <ListItem>
                                     <ListItemText
-                                        primary="Tags"
-                                        secondary={
-                                            <Box sx={{ mt: 1 }}>
-                                                {document.Tags.map(tag => (
-                                                    <Chip
-                                                        key={tag}
-                                                        label={tag}
-                                                        sx={{ mr: 1, mb: 1 }}
-                                                    />
-                                                ))}
-                                            </Box>
-                                        }
+                                        primary="Owner"
+                                        secondary={document.Owner}
                                     />
                                 </ListItem>
-                            )}
-                        </List>
-                    </Paper>
+                                <ListItem>
+                                    <ListItemText
+                                        primary="Upload Date"
+                                        secondary={formatDate(document.DateUploaded)}
+                                    />
+                                </ListItem>
+                                <ListItem>
+                                    <ListItemText
+                                        primary="File Name"
+                                        secondary={document.FileDetails?.fileName}
+                                    />
+                                </ListItem>
+                                <ListItem>
+                                    <ListItemText
+                                        primary="Content Type"
+                                        secondary={document.FileDetails?.contentType}
+                                    />
+                                </ListItem>
+                                {document.Tags && (
+                                    <ListItem>
+                                        <ListItemText
+                                            primary="Tags"
+                                            secondary={
+                                                <Box sx={{ mt: 1 }}>
+                                                    {document.Tags.map(tag => (
+                                                        <Chip
+                                                            key={tag}
+                                                            label={tag}
+                                                            sx={{ mr: 1, mb: 1 }}
+                                                        />
+                                                    ))}
+                                                </Box>
+                                            }
+                                        />
+                                    </ListItem>
+                                )}
+                            </List>
+                        </Paper>
+
+                        <Comments documentId={id} />
+                    </Grid>
                 </Grid>
-            </Grid>
-        </div>
+            </div>
+        </Container>
     );
 }
 
