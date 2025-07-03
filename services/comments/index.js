@@ -1,5 +1,5 @@
-import { DeleteCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
-import { PutEventsCommand } from "@aws-sdk/client-eventbridge";
+import { DeleteCommand, QueryCommand } from '@aws-sdk/lib-dynamodb';
+import { PutEventsCommand } from '@aws-sdk/client-eventbridge';
 import { createRouter, RouterType, Matcher, validatePathVariables, validateBodyJSONVariables, getLogger } from 'lambda-micro';
 import { AWSClients, generateID } from '../common';
 
@@ -29,7 +29,7 @@ const getAllCommentsForDocument = async (request, response) => {
     };
     const results = await dynamoDB.send(new QueryCommand(params));
 
-    logger.info("Successfully got all comments");
+    logger.info('Successfully got all comments');
 
     return response.output(results.Items, 200);
 };
@@ -55,7 +55,7 @@ const createComment = async (request, response) => {
     };
     await dynamoDB.put(params);
 
-    logger.info("Raising a new CommentAdded event");
+    logger.info('Raising a new CommentAdded event');
 
     const detail = {
         documentId: request.pathVariables.docid,
@@ -74,20 +74,33 @@ const createComment = async (request, response) => {
     };
     await eventbridge.send(new PutEventsCommand(eventParams));
 
-    logger.info("Successfully raised CommentAdded event");
+    logger.info('Successfully raised CommentAdded event');
 
     return response.output(item, 200);
 };
 
 const deleteComment = async (request, response) => {
+    const logger = getLogger(request.event, request.context);
+
+    logger.info(`Deleting comment id ${request.pathVariables.commentid} for document id ${request.pathVariables.docid}`);
+
+    const sk = `Comment#${request.pathVariables.commentid}`;
     const params = {
         TableName: tableName,
         Key: {
             PK: request.pathVariables.docid,
-            SK: `Comment#${request.pathVariables.commentid}`
-        }
+            SK: sk
+        },
+        ReturnValues: 'ALL_OLD'
     };
-    await dynamoDB.send(new DeleteCommand(params));
+    const result = await dynamoDB.send(new DeleteCommand(params));
+
+    if (!result.Attributes) {
+        logger.info(`No item was found to delete with PK ${request.pathVariables.docid} and SK: ${sk}`);
+        return response.output({}, 404);
+    }
+
+    logger.info('Successfully deleted comment');
     return response.output({}, 200);
 };
 

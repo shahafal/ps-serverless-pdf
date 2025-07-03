@@ -89,7 +89,8 @@ function Comments({ documentId }) {
 
         setDeleteLoading(true);
         try {
-            await deleteComment(documentId, commentToDelete.SK);
+            const commentId = commentToDelete.SK.substring(8);
+            await deleteComment(documentId, commentId);
             setComments(prev => prev.filter(c => c.SK !== commentToDelete.SK));
             setDeleteDialogOpen(false);
             setCommentToDelete(null);
