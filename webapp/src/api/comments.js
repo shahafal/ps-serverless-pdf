@@ -21,7 +21,6 @@ export async function fetchComments(documentId) {
 
         return await response.json();
     } catch (error) {
-        console.error('Error fetching comments:', error);
         throw error;
     }
 }
@@ -46,7 +45,6 @@ export async function createComment(documentId, text) {
 
         return await response.json();
     } catch (error) {
-        console.error('Error creating comment:', error);
         throw error;
     }
 }
@@ -67,7 +65,6 @@ export async function deleteComment(documentId, commentId) {
 
         return await response.text();
     } catch (error) {
-        console.error('Error deleting comment:', error);
         throw error;
     }
 }

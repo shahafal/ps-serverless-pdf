@@ -23,29 +23,21 @@ function Users() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // Define loadUsers before useEffect
     const loadUsers = async () => {
-        console.log('Fetching users...');
         try {
             const data = await fetchUsers();
-            console.log('Users data:', data);
             setUsers(data.users || []);
             setError(null);
         } catch (err) {
-            console.error('Load users error:', err);
             setError('Failed to load users. Please try again later.');
         } finally {
             setLoading(false);
         }
     };
 
-    // Use loadUsers in useEffect
     useEffect(() => {
-        console.log('Users component mounted');
         loadUsers();
     }, []);
-
-    console.log('Current users state:', users); // Debug log
 
     if (loading) {
         return (

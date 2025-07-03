@@ -25,7 +25,6 @@ export function UserProvider({ children }) {
     async function loadUserProfiles() {
         try {
             const response = await fetchUserProfiles();
-            // Convert array to object for O(1) lookups
             const profilesMap = response.users.reduce((acc, profile) => {
                 acc[profile.userId] = profile;
                 return acc;
@@ -33,23 +32,16 @@ export function UserProvider({ children }) {
             setUserProfiles(profilesMap);
             setError(null);
         } catch (err) {
-            console.error('Error loading user profiles:', err);
             setError('Failed to load user profiles');
         } finally {
             setLoading(false);
         }
     }
 
-    // Utility function to render user name and avatar consistently
     function renderUser(userId, options = {}) {
         const { avatarOnly = false, avatarSize = 24 } = options;
         const profile = userProfiles[userId] || {};
         const name = profile.name;
-        
-        // Always return name instead of userId if profile exists
-        if (!profile.name) {
-            console.warn(`No profile found for user ${userId}`);
-        }
 
         if (avatarOnly) {
             return (

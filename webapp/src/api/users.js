@@ -21,7 +21,6 @@ export async function fetchUsers() {
 
         return await response.json();
     } catch (error) {
-        console.error('Error fetching users:', error);
         throw error;
     }
 }
@@ -41,7 +40,6 @@ export async function fetchUserProfiles() {
 
         return await response.json();
     } catch (error) {
-        console.error('Error fetching user profiles:', error);
         throw error;
     }
 }
@@ -64,7 +62,6 @@ export async function createUser(userData) {
 
         return await response.json();
     } catch (error) {
-        console.error('Error creating user:', error);
         throw error;
     }
 }
@@ -86,7 +83,6 @@ export async function deleteUser(userId) {
         const data = await response.text();
         return { message: data };
     } catch (error) {
-        console.error('Error deleting user:', error);
         throw error;
     }
 }

@@ -7,7 +7,6 @@ export async function getUserGroups() {
         const groups = user.signInUserSession.accessToken.payload['cognito:groups'] || [];
         return groups;
     } catch (error) {
-        console.error('Error getting user groups:', error);
         return [];
     }
 }

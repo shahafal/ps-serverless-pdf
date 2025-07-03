@@ -21,7 +21,6 @@ export async function fetchDocuments() {
 
         return await response.json();
     } catch (error) {
-        console.error('Error fetching documents:', error);
         throw error;
     }
 }
@@ -41,7 +40,6 @@ export async function fetchDocument(id) {
 
         return await response.json();
     } catch (error) {
-        console.error('Error fetching document:', error);
         throw error;
     }
 }
@@ -62,7 +60,6 @@ export async function deleteDocument(id) {
 
         return await response.json();
     } catch (error) {
-        console.error('Error deleting document:', error);
         throw error;
     }
 }
@@ -72,7 +69,6 @@ export async function createDocument(file, name, tags) {
         const token = await getAuthToken();
         const formData = new FormData();
 
-        // Add file with fieldName 'document' to match schema
         formData.append('document', file);
         formData.append('name', name);
         if (tags && tags.length > 0) {
@@ -87,14 +83,6 @@ export async function createDocument(file, name, tags) {
             body: formData
         });
 
-        // Debug response
-        console.log('Response:', {
-            status: response.status,
-            ok: response.ok,
-            statusText: response.statusText
-        });
-
-        // Handle error responses
         if (response.status !== 200) {
             // Try to parse error as JSON, fallback to text if not JSON
             const errorText = await response.text();
@@ -108,15 +96,12 @@ export async function createDocument(file, name, tags) {
             throw new Error(errorMessage || 'Failed to create document');
         }
 
-        // For successful response, get the message text
-        const message = await response.text();
         return {
             success: true,
-            message: message || 'Document uploaded successfully. Please wait a few minutes while we process it.'
+            message: 'Document uploaded successfully. Please wait a few minutes while we process it.'
         };
 
     } catch (error) {
-        console.error('Error creating document:', error);
         throw error;
     }
 }
