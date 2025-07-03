@@ -22,6 +22,7 @@ import {
 import { Send as SendIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { fetchComments, createComment, deleteComment } from '../api/comments';
 import { useUserGroups } from '../utils/auth';
+import { useUsers } from '../utils/UserProvider';
 
 function formatDate(isoDate) {
     return new Date(isoDate).toLocaleDateString('en-US', {
@@ -35,6 +36,7 @@ function formatDate(isoDate) {
 
 function Comments({ documentId }) {
     const { canCreateDocuments } = useUserGroups(); // Admin or contributor
+    const { renderUser } = useUsers();
     const [comments, setComments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -139,13 +141,16 @@ function Comments({ documentId }) {
                         >
                             <ListItemText
                                 primary={
-                                    <Typography
-                                        component="span"
-                                        variant="body2"
-                                        color="text.primary"
-                                    >
-                                        {comment.Owner}
-                                    </Typography>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        {renderUser(comment.Owner, { avatarSize: 32 }).avatar}
+                                        <Typography
+                                            component="span"
+                                            variant="body2"
+                                            color="text.primary"
+                                        >
+                                            {renderUser(comment.Owner).name || 'Unknown User'}
+                                        </Typography>
+                                    </Box>
                                 }
                                 secondary={
                                     <>

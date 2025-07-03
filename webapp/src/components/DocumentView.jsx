@@ -26,6 +26,7 @@ import { ArrowBack, Download, Delete } from '@mui/icons-material';
 import { fetchDocument, deleteDocument } from '../api/documents';
 import Comments from './Comments';
 import { useUserGroups } from '../utils/auth';
+import { useUsers } from '../utils/UserProvider';
 
 function formatDate(isoDate) {
     return new Date(isoDate).toLocaleDateString('en-US', {
@@ -41,6 +42,7 @@ function DocumentView() {
     const { id } = useParams();
     const navigate = useNavigate();
     const { canCreateDocuments } = useUserGroups();
+    const { renderUser } = useUsers();
     const [document, setDocument] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -158,7 +160,12 @@ function DocumentView() {
                                 <ListItem>
                                     <ListItemText
                                         primary="Owner"
-                                        secondary={document.Owner}
+                                        secondary={
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
+                                                {renderUser(document.Owner, { avatarSize: 32 }).avatar}
+                                                <span>{renderUser(document.Owner).name || 'Unknown User'}</span>
+                                            </Box>
+                                        }
                                     />
                                 </ListItem>
                                 <ListItem>

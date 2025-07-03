@@ -12,16 +12,19 @@ import {
     CircularProgress,
     Alert,
     Button,
-    Box
+    Box,
+    Stack
 } from '@mui/material';
 import { Add as AddIcon, People as PeopleIcon } from '@mui/icons-material';
 import { fetchDocuments } from '../api/documents';
 import { useUserGroups } from '../utils/auth';
+import { useUsers } from '../utils/UserProvider';
 
 function Documents() {
     const navigate = useNavigate();
     const location = useLocation();
     const { canCreateDocuments, isAdmin, loading: loadingPermissions } = useUserGroups();
+    const { renderUser, loading: loadingUsers } = useUsers();
     const [documents, setDocuments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -65,7 +68,7 @@ function Documents() {
         navigate(`/documents/${id}`);
     }
 
-    if (loading || loadingPermissions) {
+    if (loading || loadingPermissions || loadingUsers) {
         return (
             <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem' }}>
                 <CircularProgress />
@@ -139,7 +142,12 @@ function Documents() {
                                 sx={{ cursor: 'pointer' }}
                             >
                                 <TableCell>{doc.Name}</TableCell>
-                                <TableCell>{doc.Owner}</TableCell>
+                                <TableCell>
+                                    <Stack direction="row" spacing={1} alignItems="center">
+                                        {renderUser(doc.Owner, { avatarSize: 32 }).avatar}
+                                        <span>{renderUser(doc.Owner).name || 'Unknown User'}</span>
+                                    </Stack>
+                                </TableCell>
                                 <TableCell>{formatDate(doc.DateUploaded)}</TableCell>
                             </TableRow>
                         ))}

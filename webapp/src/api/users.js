@@ -26,6 +26,26 @@ export async function fetchUsers() {
     }
 }
 
+export async function fetchUserProfiles() {
+    try {
+        const token = await getAuthToken();
+        const response = await fetch(`${API_ENDPOINT}/users/profiles`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch user profiles');
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching user profiles:', error);
+        throw error;
+    }
+}
+
 export async function createUser(userData) {
     try {
         const token = await getAuthToken();

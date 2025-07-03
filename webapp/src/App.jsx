@@ -10,6 +10,7 @@ import DocumentView from './components/DocumentView';
 import CreateDocument from './components/CreateDocument';
 import AuthWrapper, { ProtectedCreateRoute } from './components/AuthWrapper';
 import { useUserGroups } from './utils/auth';
+import { UserProvider } from './utils/UserProvider';
 
 Amplify.configure({ Auth: AUTH_CONFIG });
 
@@ -26,7 +27,8 @@ function App() {
                 SignUp: () => null
             }}>
                 {({ signOut }) => (
-                    <AuthWrapper signOut={signOut}>
+                    <UserProvider>
+                        <AuthWrapper signOut={signOut}>
                         <Routes>
                             <Route path="/users" element={<RequireAdmin><Users /></RequireAdmin>} />
                             <Route
@@ -42,7 +44,8 @@ function App() {
                             <Route path="/" element={<Navigate to="/documents" replace />} />
                             <Route path="*" element={<Navigate to="/documents" replace />} />
                         </Routes>
-                    </AuthWrapper>
+                        </AuthWrapper>
+                    </UserProvider>
                 )}
             </Authenticator>
         </Router>
