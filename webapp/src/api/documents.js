@@ -46,11 +46,33 @@ export async function fetchDocument(id) {
     }
 }
 
+export async function deleteDocument(id) {
+    try {
+        const token = await getAuthToken();
+        const response = await fetch(`${API_ENDPOINT}/documents/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to delete document');
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('Error deleting document:', error);
+        throw error;
+    }
+}
+
 export async function createDocument(file, name, tags) {
     try {
         const token = await getAuthToken();
         const formData = new FormData();
 
+        // Add file with fieldName 'document' to match schema
         formData.append('document', file);
         formData.append('name', name);
         if (tags && tags.length > 0) {
@@ -65,13 +87,32 @@ export async function createDocument(file, name, tags) {
             body: formData
         });
 
+        // Debug response
+        console.log('Response:', {
+            status: response.status,
+            ok: response.ok,
+            statusText: response.statusText
+        });
+
+        // Handle error responses
         if (response.status !== 200) {
-            throw new Error('Failed to create document');
+            // Try to parse error as JSON, fallback to text if not JSON
+            const errorText = await response.text();
+            let errorMessage;
+            try {
+                const errorData = JSON.parse(errorText);
+                errorMessage = errorData.message;
+            } catch (e) {
+                errorMessage = errorText;
+            }
+            throw new Error(errorMessage || 'Failed to create document');
         }
 
+        // For successful response, get the message text
+        const message = await response.text();
         return {
             success: true,
-            message: 'Document uploaded successfully. Please wait a few minutes while we process it.'
+            message: message || 'Document uploaded successfully. Please wait a few minutes while we process it.'
         };
 
     } catch (error) {
