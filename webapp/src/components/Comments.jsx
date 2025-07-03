@@ -141,16 +141,18 @@ function Comments({ documentId }) {
                         >
                             <ListItemText
                                 primary={
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                        {renderUser(comment.Owner, { avatarSize: 32 }).avatar}
-                                        <Typography
-                                            component="span"
-                                            variant="body2"
-                                            color="text.primary"
-                                        >
-                                            {renderUser(comment.Owner).name || 'Unknown User'}
-                                        </Typography>
-                                    </Box>
+                                    <Typography component="div">
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                            {renderUser(comment.Owner, { avatarSize: 32 }).avatar}
+                                            <Typography
+                                                component="span"
+                                                variant="body2"
+                                                color="text.primary"
+                                            >
+                                                {renderUser(comment.Owner).name || 'Unknown User'}
+                                            </Typography>
+                                        </Box>
+                                    </Typography>
                                 }
                                 secondary={
                                     <>

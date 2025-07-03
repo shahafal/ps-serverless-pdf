@@ -161,10 +161,12 @@ function DocumentView() {
                                     <ListItemText
                                         primary="Owner"
                                         secondary={
-                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
-                                                {renderUser(document.Owner, { avatarSize: 32 }).avatar}
-                                                <span>{renderUser(document.Owner).name || 'Unknown User'}</span>
-                                            </Box>
+                                            <Typography component="div">
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                    {renderUser(document.Owner, { avatarSize: 32 }).avatar}
+                                                    <span>{renderUser(document.Owner).name || 'Unknown User'}</span>
+                                                </Box>
+                                            </Typography>
                                         }
                                     />
                                 </ListItem>

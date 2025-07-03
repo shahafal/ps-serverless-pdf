@@ -143,10 +143,12 @@ function Documents() {
                             >
                                 <TableCell>{doc.Name}</TableCell>
                                 <TableCell>
-                                    <Stack direction="row" spacing={1} alignItems="center">
-                                        {renderUser(doc.Owner, { avatarSize: 32 }).avatar}
-                                        <span>{renderUser(doc.Owner).name || 'Unknown User'}</span>
-                                    </Stack>
+                                    <Typography component="div">
+                                        <Stack direction="row" spacing={1} alignItems="center">
+                                            {renderUser(doc.Owner, { avatarSize: 32 }).avatar}
+                                            <span>{renderUser(doc.Owner).name || 'Unknown User'}</span>
+                                        </Stack>
+                                    </Typography>
                                 </TableCell>
                                 <TableCell>{formatDate(doc.DateUploaded)}</TableCell>
                             </TableRow>
