@@ -1,17 +1,12 @@
 import React from 'react';
-import { Authenticator } from '@aws-amplify/ui-react';
 import { ThemeProvider, CssBaseline, Button } from '@mui/material';
 import { createTheme } from '@mui/material/styles';
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import '@aws-amplify/ui-react/styles.css';
-import Documents from './Documents';
-import DocumentView from './DocumentView';
-import CreateDocument from './CreateDocument';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useUserGroups } from '../utils/auth';
 
 const theme = createTheme();
 
-function ProtectedCreateRoute() {
+export function ProtectedCreateRoute({ children }) {
     const location = useLocation();
     const { canCreateDocuments, loading } = useUserGroups();
 
@@ -20,33 +15,24 @@ function ProtectedCreateRoute() {
     }
 
     return canCreateDocuments ? (
-        <CreateDocument />
+        children
     ) : (
         <Navigate to="/documents" state={{ from: location }} replace />
     );
 }
 
-function AuthWrapper() {
+function AuthWrapper({ children, signOut }) {
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />
-            <Authenticator>
-                {({ signOut }) => (
-                    <div>
-                        <Routes>
-                            <Route path="/documents/create" element={<ProtectedCreateRoute />} />
-                            <Route path="/documents/:id" element={<DocumentView />} />
-                            <Route path="/documents" element={<Documents />} />
-                            <Route path="/" element={<Navigate to="/documents" replace />} />
-                        </Routes>
-                        <div style={{ padding: '1rem', display: 'flex', justifyContent: 'flex-end' }}>
-                            <Button variant="outlined" color="primary" onClick={signOut}>
-                                Sign out
-                            </Button>
-                        </div>
-                    </div>
-                )}
-            </Authenticator>
+            <div>
+                {children}
+                <div style={{ padding: '1rem', display: 'flex', justifyContent: 'flex-end' }}>
+                    <Button variant="outlined" color="primary" onClick={signOut}>
+                        Sign out
+                    </Button>
+                </div>
+            </div>
         </ThemeProvider>
     );
 }

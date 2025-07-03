@@ -14,14 +14,14 @@ import {
     Button,
     Box
 } from '@mui/material';
-import { Add as AddIcon } from '@mui/icons-material';
+import { Add as AddIcon, People as PeopleIcon } from '@mui/icons-material';
 import { fetchDocuments } from '../api/documents';
 import { useUserGroups } from '../utils/auth';
 
 function Documents() {
     const navigate = useNavigate();
     const location = useLocation();
-    const { canCreateDocuments, loading: loadingPermissions } = useUserGroups();
+    const { canCreateDocuments, isAdmin, loading: loadingPermissions } = useUserGroups();
     const [documents, setDocuments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -97,16 +97,28 @@ function Documents() {
                 <Typography variant="h4" component="h1">
                     Documents
                 </Typography>
-                {canCreateDocuments && (
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        startIcon={<AddIcon />}
-                        onClick={() => navigate('/documents/create')}
-                    >
-                        Create Document
-                    </Button>
-                )}
+                <Box sx={{ display: 'flex', gap: 2 }}>
+                    {isAdmin && (
+                        <Button
+                            variant="contained"
+                            color="secondary"
+                            startIcon={<PeopleIcon />}
+                            onClick={() => navigate('/users')}
+                        >
+                            Manage Users
+                        </Button>
+                    )}
+                    {canCreateDocuments && (
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            startIcon={<AddIcon />}
+                            onClick={() => navigate('/documents/create')}
+                        >
+                            Create Document
+                        </Button>
+                    )}
+                </Box>
             </Box>
 
             <TableContainer component={Paper}>
