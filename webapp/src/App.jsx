@@ -22,7 +22,9 @@ function RequireAdmin({ children }) {
 function App() {
     return (
         <Router>
-            <Authenticator>
+            <Authenticator hideSignUp={true} components={{
+                SignUp: () => null
+            }}>
                 {({ signOut }) => (
                     <AuthWrapper signOut={signOut}>
                         <Routes>
