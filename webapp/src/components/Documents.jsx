@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { 
     Paper, 
     Table, 
@@ -10,19 +10,34 @@ import {
     TableRow,
     Typography,
     CircularProgress,
-    Alert
+    Alert,
+    Button,
+    Box
 } from '@mui/material';
+import { Add as AddIcon } from '@mui/icons-material';
 import { fetchDocuments } from '../api/documents';
+import { useUserGroups } from '../utils/auth';
 
 function Documents() {
     const navigate = useNavigate();
+    const location = useLocation();
+    const { canCreateDocuments, loading: loadingPermissions } = useUserGroups();
     const [documents, setDocuments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [notification, setNotification] = useState(location.state?.message);
 
     useEffect(() => {
         loadDocuments();
     }, []);
+
+    // Clear navigation state after showing notification
+    useEffect(() => {
+        if (location.state?.message) {
+            // Clear the navigation state
+            window.history.replaceState({}, document.title);
+        }
+    }, [location.state]);
 
     async function loadDocuments() {
         try {
@@ -50,7 +65,7 @@ function Documents() {
         navigate(`/documents/${id}`);
     }
 
-    if (loading) {
+    if (loading || loadingPermissions) {
         return (
             <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem' }}>
                 <CircularProgress />
@@ -68,9 +83,32 @@ function Documents() {
 
     return (
         <div style={{ padding: '1rem' }}>
-            <Typography variant="h4" component="h1" gutterBottom>
-                Documents
-            </Typography>
+            {notification && (
+                <Alert 
+                    severity={location.state?.severity || 'success'} 
+                    sx={{ mb: 2 }}
+                    onClose={() => setNotification(null)}
+                >
+                    {notification}
+                </Alert>
+            )}
+
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                <Typography variant="h4" component="h1">
+                    Documents
+                </Typography>
+                {canCreateDocuments && (
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        startIcon={<AddIcon />}
+                        onClick={() => navigate('/documents/create')}
+                    >
+                        Create Document
+                    </Button>
+                )}
+            </Box>
+
             <TableContainer component={Paper}>
                 <Table>
                     <TableHead>

@@ -45,3 +45,37 @@ export async function fetchDocument(id) {
         throw error;
     }
 }
+
+export async function createDocument(file, name, tags) {
+    try {
+        const token = await getAuthToken();
+        const formData = new FormData();
+
+        formData.append('document', file);
+        formData.append('name', name);
+        if (tags && tags.length > 0) {
+            formData.append('tags', tags.join(','));
+        }
+
+        const response = await fetch(`${API_ENDPOINT}/documents/`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+            body: formData
+        });
+
+        if (response.status !== 200) {
+            throw new Error('Failed to create document');
+        }
+
+        return {
+            success: true,
+            message: 'Document uploaded successfully. Please wait a few minutes while we process it.'
+        };
+
+    } catch (error) {
+        console.error('Error creating document:', error);
+        throw error;
+    }
+}
