@@ -50,3 +50,24 @@ export async function createComment(documentId, text) {
         throw error;
     }
 }
+
+export async function deleteComment(documentId, commentId) {
+    try {
+        const token = await getAuthToken();
+        const response = await fetch(`${API_ENDPOINT}/comments/${documentId}/${commentId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to delete comment');
+        }
+
+        return await response.text();
+    } catch (error) {
+        console.error('Error deleting comment:', error);
+        throw error;
+    }
+}

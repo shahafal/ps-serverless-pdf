@@ -10,10 +10,18 @@ import {
     Box,
     Divider,
     CircularProgress,
-    Alert
+    Alert,
+    IconButton,
+    Tooltip,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle
 } from '@mui/material';
-import { Send as SendIcon } from '@mui/icons-material';
-import { fetchComments, createComment } from '../api/comments';
+import { Send as SendIcon, Delete as DeleteIcon } from '@mui/icons-material';
+import { fetchComments, createComment, deleteComment } from '../api/comments';
+import { useUserGroups } from '../utils/auth';
 
 function formatDate(isoDate) {
     return new Date(isoDate).toLocaleDateString('en-US', {
@@ -26,11 +34,15 @@ function formatDate(isoDate) {
 }
 
 function Comments({ documentId }) {
+    const { canCreateDocuments } = useUserGroups(); // Admin or contributor
     const [comments, setComments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [newComment, setNewComment] = useState('');
     const [submitting, setSubmitting] = useState(false);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [commentToDelete, setCommentToDelete] = useState(null);
+    const [deleteLoading, setDeleteLoading] = useState(false);
 
     useEffect(() => {
         loadComments();
@@ -65,6 +77,27 @@ function Comments({ documentId }) {
         }
     }
 
+    const handleDeleteClick = (comment) => {
+        setCommentToDelete(comment);
+        setDeleteDialogOpen(true);
+    };
+
+    const handleDeleteConfirm = async () => {
+        if (!commentToDelete) return;
+
+        setDeleteLoading(true);
+        try {
+            await deleteComment(documentId, commentToDelete.SK);
+            setComments(prev => prev.filter(c => c.SK !== commentToDelete.SK));
+            setDeleteDialogOpen(false);
+            setCommentToDelete(null);
+        } catch (err) {
+            setError('Failed to delete comment. Please try again.');
+        } finally {
+            setDeleteLoading(false);
+        }
+    };
+
     if (loading) {
         return (
             <Box display="flex" justifyContent="center" p={2}>
@@ -88,7 +121,22 @@ function Comments({ documentId }) {
             <List>
                 {comments.map((comment) => (
                     <React.Fragment key={comment.SK}>
-                        <ListItem alignItems="flex-start">
+                        <ListItem 
+                            alignItems="flex-start"
+                            secondaryAction={
+                                canCreateDocuments && (
+                                    <Tooltip title="Delete Comment">
+                                        <IconButton
+                                            edge="end"
+                                            color="error"
+                                            onClick={() => handleDeleteClick(comment)}
+                                        >
+                                            <DeleteIcon />
+                                        </IconButton>
+                                    </Tooltip>
+                                )
+                            }
+                        >
                             <ListItemText
                                 secondary={
                                     <>
@@ -144,6 +192,34 @@ function Comments({ documentId }) {
                     {submitting ? 'Posting...' : 'Post Comment'}
                 </Button>
             </Box>
+
+            {/* Delete Confirmation Dialog */}
+            <Dialog
+                open={deleteDialogOpen}
+                onClose={() => setDeleteDialogOpen(false)}
+            >
+                <DialogTitle>Delete Comment</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Are you sure you want to delete this comment? This action cannot be undone.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button 
+                        onClick={() => setDeleteDialogOpen(false)}
+                        disabled={deleteLoading}
+                    >
+                        Cancel
+                    </Button>
+                    <Button 
+                        onClick={handleDeleteConfirm}
+                        color="error"
+                        disabled={deleteLoading}
+                    >
+                        {deleteLoading ? 'Deleting...' : 'Delete'}
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Paper>
     );
 }
