@@ -200,6 +200,30 @@ function DocumentView() {
                             </List>
                         </Paper>
 
+                        {document.DetectedText && (
+                            <Paper sx={{ padding: 2, mt: 2, mb: 2 }}>
+                                <Typography variant="h6" gutterBottom>
+                                    Extracted Text
+                                </Typography>
+                                <Box sx={{ 
+                                    mt: 1, 
+                                    px: 1,
+                                    maxHeight: '400px',
+                                    overflowY: 'auto',
+                                    backgroundColor: 'background.default',
+                                    borderRadius: 1
+                                }}>
+                                    <Typography variant="body1" component="pre" sx={{ 
+                                        whiteSpace: 'pre-wrap',
+                                        wordBreak: 'break-word',
+                                        fontFamily: 'monospace'
+                                    }}>
+                                        {document.DetectedText}
+                                    </Typography>
+                                </Box>
+                            </Paper>
+                        )}
+
                         <Comments documentId={id} />
                     </Grid>
                 </Grid>
