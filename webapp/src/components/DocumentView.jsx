@@ -224,15 +224,16 @@ function DocumentView() {
                                         <ListItemText
                                             primary="Tags"
                                             secondary={
-                                                <Box sx={{ mt: 1 }}>
+                                                <span style={{ display: 'block', marginTop: '8px' }}>
                                                     {document.Tags.map(tag => (
                                                         <Chip
                                                             key={tag}
                                                             label={tag}
                                                             sx={{ mr: 1, mb: 1 }}
+                                                            component="span"
                                                         />
                                                     ))}
-                                                </Box>
+                                                </span>
                                             }
                                         />
                                     </ListItem>
